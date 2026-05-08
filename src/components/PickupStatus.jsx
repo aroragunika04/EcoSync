@@ -144,11 +144,50 @@ export default function PickupStatus({ stats, onComplete }) {
             </button>
             {showQR && (
               <div style={{ 
-                marginTop: '1rem', background: '#fff', padding: '0.5rem', borderRadius: '8px', 
-                boxShadow: '0 0 20px rgba(34, 197, 94, 0.4)', animate: 'fadeIn 0.3s ease'
+                marginTop: '1rem', 
+                background: '#0A0A0A', 
+                padding: '1.2rem', 
+                borderRadius: '16px', 
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                boxShadow: '0 0 30px rgba(16, 185, 129, 0.15)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '1rem',
+                animation: 'fadeIn 0.4s ease-out'
               }}>
-                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PICKUP_${stats.id}`} alt="QR Code" style={{ width: '100px', height: '100px' }} />
-                <div style={{ color: '#000', fontSize: '0.6rem', fontWeight: 700, marginTop: '0.2rem' }}>VERIFY CODE: {stats.id?.substring(0,6).toUpperCase()}</div>
+                <div style={{
+                  padding: '0.6rem',
+                  background: '#fff',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 20px rgba(255, 255, 255, 0.05)'
+                }}>
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=PICKUP_${stats.id}`} 
+                    alt="QR Code" 
+                    style={{ width: '120px', height: '120px', display: 'block' }} 
+                  />
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ 
+                    color: '#10B981', 
+                    fontSize: '0.7rem', 
+                    fontWeight: 800, 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.08em',
+                    marginBottom: '0.2rem'
+                  }}>
+                    Secure Verification Token
+                  </div>
+                  <div style={{ 
+                    color: 'rgba(255,255,255,0.5)', 
+                    fontSize: '0.6rem',
+                    fontWeight: 500,
+                    lineHeight: '1.4'
+                  }}>
+                    Present this code to the recycler<br/>to authorize pickup
+                  </div>
+                </div>
               </div>
             )}
           </div>
