@@ -13,7 +13,7 @@ import { completePickup } from "../services/wasteService";
 export default function Dashboard() {
   const { userData, currentUser } = useAuth();
   
-  const [stats, setStats] = useState({ current: 0, goal: 20 });
+  const [stats, setStats] = useState({ current: 0, goal: 20, status: "collecting" });
   const [logs, setLogs] = useState([]);
   const [isLoggerOpen, setIsLoggerOpen] = useState(false);
   const [loggerInitialItem, setLoggerInitialItem] = useState(null);
@@ -101,8 +101,8 @@ export default function Dashboard() {
             <button className="btn btn-primary" onClick={() => {
               setLoggerInitialItem(null);
               setIsLoggerOpen(true);
-            }} disabled={stats.status !== "collecting"} style={{padding: '0.6rem 1.5rem', fontSize: '0.9rem'}}>
-              {stats.status !== "collecting" ? "Pickup Scheduled" : "Log E-Waste Now →"}
+            }} disabled={stats.status !== "collecting" && stats.current > 0} style={{padding: '0.6rem 1.5rem', fontSize: '0.9rem'}}>
+              {stats.status !== "collecting" && stats.current > 0 ? "Pickup Scheduled" : "Log E-Waste Now →"}
             </button>
           </div>
           <img src="/images/Bin (1).png" alt="E-Waste Bin" className="dash-hero-bg" />
@@ -146,7 +146,7 @@ export default function Dashboard() {
           <div className="card-header" style={{marginBottom: '1rem'}}>
             <h3 style={{fontSize: '1rem'}}>One Tap Logger</h3>
           </div>
-          <OneTapLogger status={stats.status} onOpenAdvanced={(item = null) => {
+          <OneTapLogger status={(stats.status === "collecting" || stats.current === 0) ? "collecting" : stats.status} onOpenAdvanced={(item = null) => {
             setLoggerInitialItem(item);
             setIsLoggerOpen(true);
           }} />
