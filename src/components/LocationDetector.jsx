@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getNearbyClusters, geocodeCity, assignNearestCluster, getReverseGeocode, getClustersInArea } from "../services/clusterService";
+import { getNearbyClusters, geocodeCity, assignNearestCluster, getReverseGeocode, getClustersInArea, createNewCluster } from "../services/clusterService";
 
 export default function LocationDetector({ uid, onSelectCluster }) {
   const [loading, setLoading] = useState(false);
@@ -85,6 +85,42 @@ export default function LocationDetector({ uid, onSelectCluster }) {
       (position) => performAssignment(position.coords.latitude, position.coords.longitude),
       () => handleManualFallback()
     );
+  }
+
+  async function handleCreateNew(overrideCoords = null) {
+    setLoading(true);
+    setStatus("Initializing new network node...");
+
+    const performCreation = async (lat, lon) => {
+      try {
+        const [result, name] = await Promise.all([
+          createNewCluster(uid, lat, lon),
+          getReverseGeocode(lat, lon)
+        ]);
+        setAssigned(result);
+        setLocationName(name);
+        if (onSelectCluster) onSelectCluster(result.cluster.id);
+      } catch (err) {
+        console.error("Creation failed", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (overrideCoords) {
+      await performCreation(overrideCoords.lat, overrideCoords.lon);
+      return;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => performCreation(position.coords.latitude, position.coords.longitude),
+        () => handleManualFallback()
+      );
+    } else {
+      handleManualFallback();
+    }
   }
 
   function handleManualFallback() {
@@ -188,9 +224,14 @@ export default function LocationDetector({ uid, onSelectCluster }) {
                 <h3 className="form-label" style={{ color: "var(--clr-primary)", margin: 0 }}>
                   Nodes Detected ({clusters.length})
                 </h3>
-                <button className="btn btn-primary" style={{padding: "0.4rem 0.8rem", fontSize: "0.7rem"}} onClick={handleAutoAssign}>
-                  Auto-Link Nearest Node
-                </button>
+                <div style={{display: "flex", gap: "0.5rem"}}>
+                  <button className="btn btn-primary" style={{padding: "0.4rem 0.8rem", fontSize: "0.7rem"}} onClick={handleAutoAssign}>
+                    Auto-Link Nearest
+                  </button>
+                  <button className="btn btn-outline" style={{padding: "0.4rem 0.8rem", fontSize: "0.7rem", border: "1px solid var(--clr-primary)", color: "var(--clr-primary)"}} onClick={() => handleCreateNew(searchCoords)}>
+                    Create New Node
+                  </button>
+                </div>
               </div>
               <div className="cluster-list">
                 {clusters.map((cluster) => (
@@ -225,7 +266,7 @@ export default function LocationDetector({ uid, onSelectCluster }) {
               <button 
                 className="btn btn-primary btn-block" 
                 style={{marginBottom: "1rem"}}
-                onClick={() => handleAutoAssign(searchCoords)}
+                onClick={() => handleCreateNew(searchCoords)}
               >
                 Initialize New Network Node in {locationName || manualInput}
               </button>

@@ -79,6 +79,24 @@ export async function assignNearestCluster(uid, lat, lon) {
   }
 }
 
+export async function createNewCluster(uid, lat, lon) {
+  const newClusterRef = doc(collection(db, "clusters"));
+  const newClusterData = {
+    id: newClusterRef.id,
+    name: `Node-${newClusterRef.id.substring(0, 4).toUpperCase()}`,
+    latitude: lat,
+    longitude: lon,
+    totalWeight: 0,
+    threshold: 10000,
+    status: "collecting",
+  };
+
+  await setDoc(newClusterRef, newClusterData);
+  await assignUserCluster(uid, newClusterRef.id);
+  
+  return { cluster: newClusterData, distance: 0, isNew: true };
+}
+
 export async function fetchClusters() {
   const clustersRef = collection(db, "clusters");
   const snapshot = await getDocs(clustersRef);
