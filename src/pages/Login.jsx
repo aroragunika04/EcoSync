@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../services/authService";
+import { login, resetPassword } from "../services/authService";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebase";
 
@@ -10,6 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -40,6 +41,22 @@ export default function Login() {
       setLoading(false);
     }
   }
+  
+  async function handleReset() {
+    if (!email) {
+      setError("Please enter your email to reset password.");
+      return;
+    }
+    setError("");
+    setMessage("");
+    try {
+      await resetPassword(email);
+      setMessage("Check your inbox for reset instructions.");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to send reset email: " + err.message);
+    }
+  }
 
   return (
     <div className="split-layout">
@@ -60,6 +77,7 @@ export default function Login() {
           <p className="auth-subtitle">Enter your details to log in.</p>
           
           {error && <div style={{color: "var(--clr-error)", fontSize: "0.85rem", marginBottom: "1rem", textAlign: "center"}}>{error}</div>}
+          {message && <div style={{color: "var(--clr-primary)", fontSize: "0.85rem", marginBottom: "1rem", textAlign: "center"}}>{message}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -76,7 +94,13 @@ export default function Login() {
             <div className="form-group">
               <div style={{display: "flex", justifyContent: "space-between"}}>
                 <label className="form-label">Password</label>
-                <a href="#" style={{fontSize: "0.75rem", color: "var(--clr-primary)", fontWeight: 600}}>Request Reset?</a>
+                <button 
+                  type="button"
+                  onClick={handleReset}
+                  style={{fontSize: "0.75rem", color: "var(--clr-primary)", fontWeight: 600, background: "none", border: "none", padding: 0, cursor: "pointer"}}
+                >
+                  Request Reset?
+                </button>
               </div>
               <div className="input-with-icon">
                 <span className="icon">🔒</span>

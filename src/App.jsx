@@ -17,7 +17,7 @@ import PickupReceipt from "./pages/PickupReceipt";
 function ProtectedRoute({ children, requireCluster = true }) {
   const { currentUser, userData } = useAuth();
   
-  if (!currentUser) return <Navigate to="/login" />;
+  if (!currentUser) return <Navigate to="/signup" />;
 
   // Recyclers should not access resident routes — redirect them
   if (userData && userData.role === "recycler") {
@@ -38,7 +38,7 @@ function ProtectedRoute({ children, requireCluster = true }) {
 function RecyclerRoute({ children }) {
   const { currentUser, userData } = useAuth();
 
-  if (!currentUser) return <Navigate to="/login" />;
+  if (!currentUser) return <Navigate to="/signup" />;
 
   // Normal users cannot access recycler routes
   if (userData && userData.role !== "recycler") {
@@ -70,7 +70,7 @@ export default function App() {
       {!hideNavAndFooter && <Navbar />}
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<Navigate to="/signup" />} />
           
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
