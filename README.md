@@ -121,4 +121,7 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 ---
+## Live Deployment
+
+- AWS EC2 Deployment: http://54.196.243.166
 
